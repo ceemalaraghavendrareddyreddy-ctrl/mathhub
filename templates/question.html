@@ -30,9 +30,58 @@
 </div>
 
 <div class="nav-questions">
-    <a href="/topic/{{ q.topic_id }}" class="btn-outline">&#x1F4CB; All Questions in this Topic</a>
-    <a href="/solver" class="btn-primary">&#x1F9EE; Try AI Solver</a>
+    <a href="/topic/{{ q.topic_id }}" class="btn-outline">📋 All Questions in this Topic</a>
+    <button class="btn-bookmark" id="bm-btn" onclick="toggleBookmark()">🔖 Bookmark</button>
+    <a href="/solver" class="btn-primary">🧮 Try AI Solver</a>
 </div>
+
+<script>
+const qData = {
+    id: {{ q.id }},
+    question: {{ q.question | tojson }},
+    solution: {{ q.solution | tojson }},
+    topic: {{ q.topic | tojson }},
+    level: {{ q.level | tojson }},
+    difficulty: {{ q.difficulty | tojson }}
+};
+
+// Track topic visited
+(function() {
+    let visited = JSON.parse(localStorage.getItem('topics_visited') || '[]');
+    if (!visited.includes(qData.topic)) {
+        visited.unshift(qData.topic);
+        if (visited.length > 50) visited = visited.slice(0, 50);
+        localStorage.setItem('topics_visited', JSON.stringify(visited));
+    }
+})();
+
+// Load bookmark state
+function loadBmState() {
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    const btn = document.getElementById('bm-btn');
+    if (bookmarks.find(b => b.id === qData.id)) {
+        btn.textContent = '🔖 Bookmarked ✅';
+        btn.style.background = 'var(--green)';
+    } else {
+        btn.textContent = '🔖 Bookmark';
+        btn.style.background = '';
+    }
+}
+
+function toggleBookmark() {
+    let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    const idx = bookmarks.findIndex(b => b.id === qData.id);
+    if (idx >= 0) {
+        bookmarks.splice(idx, 1);
+    } else {
+        bookmarks.unshift(qData);
+    }
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    loadBmState();
+}
+
+window.addEventListener('load', loadBmState);
+</script>
 
 <script>
 function toggleAnswer() {

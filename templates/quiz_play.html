@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Quiz{% endblock %}
+{% block content %}
+<div class="quiz-header">
+    <div class="quiz-progress-bar">
+        <div class="quiz-progress-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="quiz-meta">
+        <span id="q-counter">Question 1 of {{ questions|length }}</span>
+        <span class="quiz-score-live">Score: <span id="live-score">0</span></span>
+        <span id="timer-display">⏱ <span id="timer">30</span>s</span>
+    </div>
+</div>
+
+<div id="quiz-area">
+    {% for q in questions %}
+    <div class="quiz-question-card" id="qcard-{{ loop.index0 }}" style="display:{% if loop.first %}block{% else %}none{% endif %}">
+        <div class="q-level-tag">{{ q.level }} — {{ q.topic }}</div>
+        <div class="quiz-badge {{ q.difficulty|lower }}">{{ q.difficulty }}</div>
+        <div class="quiz-q-text">{{ q.question }}</div>
+
+        <div class="quiz-actions">
+            <button class="btn-show-ans" onclick="showAnswer({{ loop.index0 }})">👁 Show Answer</button>
+        </div>
+
+        <div class="quiz-answer-block" id="ans-{{ loop.index0 }}" style="display:none">
+            <div class="ans-label">✅ Answer</div>
+            <div class="ans-text">{{ q.solution }}</div>
+            <div class="exp-label">💡 Explanation</div>
+            <div class="exp-text">{{ q.explanation }}</div>
+
+            <div class="self-assess">
+                <div class="assess-label">Did you get it right?</div>
+                <div class="assess-btns">
+                    <button class="btn-correct" onclick="markAnswer({{ loop.index0 }}, true)">✅ Yes, Correct!</button>
+                    <button class="btn-wrong" onclick="markAnswer({{ loop.index0 }}, false)">❌ No, Wrong</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="quiz-result-card" id="result-card" style="display:none">
+        <div class="result-icon" id="result-icon">🏆</div>
+        <div class="result-title" id="result-title">Quiz Complete!</div>
+        <div class="result-score" id="result-score"></div>
+        <div class="result-msg" id="result-msg"></div>
+        <div class="result-btns">
+            <a href="/quiz" class="btn-primary">🔄 Try Again</a>
+            <a href="/" class="btn-outline">🏠 Home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+const total = {{ questions|length }};
+let current = 0;
+let score = 0;
+let timer;
+let timeLeft = 30;
+
+const questions = {{ questions | tojson }};
+
+function startTimer() {
+    clearInterval(timer);
+    timeLeft = 30;
+    document.getElementById('timer').textContent = timeLeft;
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').textContent = timeLeft;
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            showAnswer(current);
+        }
+    }, 1000);
+}
+
+function showAnswer(idx) {
+    clearInterval(timer);
+    document.getElementById('ans-' + idx).style.display = 'block';
+    document.querySelector('#qcard-' + idx + ' .btn-show-ans').style.display = 'none';
+}
+
+function markAnswer(idx, correct) {
+    if (correct) score++;
+    document.getElementById('live-score').textContent = score;
+    document.querySelector('#qcard-' + idx + ' .self-assess').innerHTML =
+        correct ? '<div class="marked-correct">✅ Marked as Correct</div>' :
+                  '<div class="marked-wrong">❌ Marked as Wrong</div>';
+
+    setTimeout(() => nextQuestion(), 800);
+}
+
+function nextQuestion() {
+    document.getElementById('qcard-' + current).style.display = 'none';
+    current++;
+    if (current >= total) {
+        showResult();
+    } else {
+        document.getElementById('qcard-' + current).style.display = 'block';
+        document.getElementById('q-counter').textContent = `Question ${current+1} of ${total}`;
+        const pct = (current / total) * 100;
+        document.getElementById('progress-fill').style.width = pct + '%';
+        startTimer();
+    }
+}
+
+function showResult() {
+    document.getElementById('quiz-area').innerHTML = '';
+    const card = document.createElement('div');
+    card.className = 'quiz-result-card';
+    const pct = Math.round((score / total) * 100);
+    let icon = pct >= 80 ? '🏆' : pct >= 60 ? '🎯' : pct >= 40 ? '📚' : '💪';
+    let msg = pct >= 80 ? 'Excellent! You are ready for the exam!' :
+              pct >= 60 ? 'Good job! Keep practicing!' :
+              pct >= 40 ? 'Fair attempt. Revise the topics and try again.' :
+                          'Keep going! Practice makes perfect.';
+    card.innerHTML = `
+        <div class="result-icon">${icon}</div>
+        <div class="result-title">Quiz Complete!</div>
+        <div class="result-score">${score} / ${total} &nbsp; (${pct}%)</div>
+        <div class="result-progress-wrap">
+            <div class="result-progress-bar" style="width:${pct}%"></div>
+        </div>
+        <div class="result-msg">${msg}</div>
+        <div class="result-btns">
+            <a href="/quiz" class="btn-primary">🔄 Try Again</a>
+            <a href="/" class="btn-outline">🏠 Home</a>
+        </div>`;
+    document.getElementById('quiz-area').appendChild(card);
+    saveProgress(score, total);
+}
+
+function saveProgress(score, total) {
+    let history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+    history.unshift({ date: new Date().toLocaleDateString(), score, total, pct: Math.round(score/total*100) });
+    if (history.length > 20) history = history.slice(0, 20);
+    localStorage.setItem('quiz_history', JSON.stringify(history));
+}
+
+// Start
+startTimer();
+</script>
+{% endblock %}

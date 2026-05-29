@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Bookmarks{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>🔖 My Bookmarks</h1>
+    <p>Questions you saved for revision</p>
+</div>
+
+<div id="bookmarks-area">
+    <div class="loading-text">Loading bookmarks...</div>
+</div>
+
+<script>
+window.addEventListener('load', function() {
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    const el = document.getElementById('bookmarks-area');
+
+    if (bookmarks.length === 0) {
+        el.innerHTML = `<div class="empty-state">
+            <div style="font-size:3rem">🔖</div>
+            No bookmarks yet!<br>
+            Open any question and tap the <strong>Bookmark</strong> button to save it here.
+            <br><br><a href="/" class="btn-primary">Browse Questions</a>
+        </div>`;
+        return;
+    }
+
+    let html = `<div class="bm-count">${bookmarks.length} bookmarked question(s)</div>
+    <div class="questions-list">`;
+
+    bookmarks.forEach(b => {
+        html += `<div class="question-row bm-row">
+            <div class="bm-meta">${b.level} — ${b.topic}</div>
+            <div class="q-badge ${b.difficulty ? b.difficulty.toLowerCase() : 'medium'}">${b.difficulty || 'Medium'}</div>
+            <div class="q-text">${b.question}</div>
+            <div style="display:flex;gap:8px;align-items:center">
+                <a href="/question/${b.id}" class="bm-view">View →</a>
+                <button class="bm-remove" onclick="removeBookmark(${b.id})">✕</button>
+            </div>
+        </div>`;
+    });
+
+    html += '</div>';
+    el.innerHTML = html;
+});
+
+function removeBookmark(id) {
+    let bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    bookmarks = bookmarks.filter(b => b.id !== id);
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    location.reload();
+}
+</script>
+{% endblock %}

@@ -79,6 +79,49 @@ def question_page(qid):
         return "Question not found", 404
     return render_template("question.html", q=q, levels=levels)
 
+@app.route("/quiz")
+def quiz_setup():
+    conn = get_conn()
+    levels = get_levels(conn)
+    conn.close()
+    return render_template("quiz_setup.html", levels=levels)
+
+@app.route("/quiz/play")
+def quiz_play():
+    level = request.args.get("level", "all")
+    num   = int(request.args.get("num", 10))
+    diff  = request.args.get("diff", "all")
+    conn  = get_conn()
+    levels = get_levels(conn)
+    query = "SELECT q.*, t.topic, t.level, t.subject FROM questions q JOIN topics t ON q.topic_id=t.id"
+    params = []
+    conditions = []
+    if level != "all":
+        conditions.append("t.level=?"); params.append(level)
+    if diff != "all":
+        conditions.append("q.difficulty=?"); params.append(diff)
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+    query += " ORDER BY RANDOM() LIMIT ?"
+    params.append(num)
+    questions = conn.execute(query, params).fetchall()
+    conn.close()
+    return render_template("quiz_play.html", questions=questions, levels=levels)
+
+@app.route("/bookmarks")
+def bookmarks_page():
+    conn = get_conn()
+    levels = get_levels(conn)
+    conn.close()
+    return render_template("bookmarks.html", levels=levels)
+
+@app.route("/progress")
+def progress_page():
+    conn = get_conn()
+    levels = get_levels(conn)
+    conn.close()
+    return render_template("progress.html", levels=levels)
+
 @app.route("/solver")
 def solver_page():
     conn = get_conn()

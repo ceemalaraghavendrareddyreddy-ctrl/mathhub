@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Progress Tracker{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>📊 Progress Tracker</h1>
+    <p>Track your study progress and quiz history</p>
+</div>
+
+<div class="progress-wrap">
+    <div class="progress-section">
+        <div class="prog-sec-title">🎯 Quiz History</div>
+        <div id="quiz-history-area">
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <div class="prog-sec-title">📚 Topics Visited</div>
+        <div id="topics-visited-area">
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <div class="prog-sec-title">🔖 Bookmarks</div>
+        <div id="bookmarks-summary">
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<div class="clear-btn-wrap">
+    <button class="btn-clear" onclick="clearAll()">🗑 Clear All Progress</button>
+</div>
+
+<script>
+window.addEventListener('load', function() {
+    loadQuizHistory();
+    loadTopicsVisited();
+    loadBookmarksSummary();
+});
+
+function loadQuizHistory() {
+    const history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+    const el = document.getElementById('quiz-history-area');
+    if (history.length === 0) {
+        el.innerHTML = '<div class="empty-prog">No quizzes taken yet. <a href="/quiz">Start a Quiz!</a></div>';
+        return;
+    }
+    let avg = Math.round(history.reduce((a,b) => a + b.pct, 0) / history.length);
+    let html = `<div class="stat-row">
+        <div class="stat-box"><div class="stat-num">${history.length}</div><div class="stat-label">Quizzes Taken</div></div>
+        <div class="stat-box"><div class="stat-num">${avg}%</div><div class="stat-label">Average Score</div></div>
+        <div class="stat-box"><div class="stat-num">${Math.max(...history.map(h=>h.pct))}%</div><div class="stat-label">Best Score</div></div>
+    </div>
+    <div class="history-list">`;
+    history.slice(0,10).forEach(h => {
+        const color = h.pct >= 80 ? 'var(--green)' : h.pct >= 60 ? 'var(--yellow)' : 'var(--red)';
+        html += `<div class="history-row">
+            <span class="hist-date">${h.date}</span>
+            <div class="hist-bar-wrap"><div class="hist-bar" style="width:${h.pct}%;background:${color}"></div></div>
+            <span class="hist-score" style="color:${color}">${h.score}/${h.total} (${h.pct}%)</span>
+        </div>`;
+    });
+    html += '</div>';
+    el.innerHTML = html;
+}
+
+function loadTopicsVisited() {
+    const visited = JSON.parse(localStorage.getItem('topics_visited') || '[]');
+    const el = document.getElementById('topics-visited-area');
+    if (visited.length === 0) {
+        el.innerHTML = '<div class="empty-prog">No topics visited yet. <a href="/">Browse topics!</a></div>';
+        return;
+    }
+    let html = `<div class="visited-count">${visited.length} topics studied</div><div class="visited-list">`;
+    visited.slice(0, 20).forEach(t => {
+        html += `<span class="visited-tag">✅ ${t}</span>`;
+    });
+    html += '</div>';
+    el.innerHTML = html;
+}
+
+function loadBookmarksSummary() {
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    const el = document.getElementById('bookmarks-summary');
+    if (bookmarks.length === 0) {
+        el.innerHTML = '<div class="empty-prog">No bookmarks yet. Bookmark questions while studying!</div>';
+        return;
+    }
+    el.innerHTML = `<div class="visited-count">${bookmarks.length} questions bookmarked</div>
+    <a href="/bookmarks" class="btn-outline" style="margin-top:12px;display:inline-block">View All Bookmarks →</a>`;
+}
+
+function clearAll() {
+    if (confirm('Clear all progress and bookmarks? This cannot be undone.')) {
+        localStorage.removeItem('quiz_history');
+        localStorage.removeItem('topics_visited');
+        localStorage.removeItem('bookmarks');
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

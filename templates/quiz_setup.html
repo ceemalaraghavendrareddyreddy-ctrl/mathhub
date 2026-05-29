@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Quiz Mode{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>🎯 Quiz Mode</h1>
+    <p>Test yourself and check your score</p>
+</div>
+
+<div class="quiz-setup-wrap">
+    <div class="setup-card">
+        <div class="setup-label">📚 Select Level</div>
+        <div class="level-btns">
+            <button class="lvl-btn active" onclick="selectLevel('all', this)">All Levels</button>
+            {% for lv in levels %}
+            <button class="lvl-btn" onclick="selectLevel('{{ lv }}', this)">{{ lv }}</button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="setup-card">
+        <div class="setup-label">🔢 Number of Questions</div>
+        <div class="num-btns">
+            <button class="num-btn" onclick="selectNum(5, this)">5</button>
+            <button class="num-btn active" onclick="selectNum(10, this)">10</button>
+            <button class="num-btn" onclick="selectNum(15, this)">15</button>
+            <button class="num-btn" onclick="selectNum(20, this)">20</button>
+        </div>
+    </div>
+
+    <div class="setup-card">
+        <div class="setup-label">⚡ Difficulty</div>
+        <div class="diff-btns">
+            <button class="diff-btn active" onclick="selectDiff('all', this)">All</button>
+            <button class="diff-btn easy" onclick="selectDiff('Easy', this)">Easy</button>
+            <button class="diff-btn medium" onclick="selectDiff('Medium', this)">Medium</button>
+            <button class="diff-btn hard" onclick="selectDiff('Hard', this)">Hard</button>
+        </div>
+    </div>
+
+    <button class="btn-start-quiz" onclick="startQuiz()">🚀 Start Quiz</button>
+</div>
+
+<script>
+let selectedLevel = 'all';
+let selectedNum = 10;
+let selectedDiff = 'all';
+
+function selectLevel(val, btn) {
+    selectedLevel = val;
+    document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+function selectNum(val, btn) {
+    selectedNum = val;
+    document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+function selectDiff(val, btn) {
+    selectedDiff = val;
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+function startQuiz() {
+    window.location.href = `/quiz/play?level=${encodeURIComponent(selectedLevel)}&num=${selectedNum}&diff=${encodeURIComponent(selectedDiff)}`;
+}
+</script>
+{% endblock %}
