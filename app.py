@@ -77,7 +77,7 @@ def question_page(qid):
     conn.close()
     if not q:
         return "Question not found", 404
-    return render_template("question.html", q=q, levels=levels)
+    return render_template("question.html", q=dict(q), levels=levels)
 
 @app.route("/quiz")
 def quiz_setup():
@@ -104,7 +104,9 @@ def quiz_play():
         query += " WHERE " + " AND ".join(conditions)
     query += " ORDER BY RANDOM() LIMIT ?"
     params.append(num)
-    questions = conn.execute(query, params).fetchall()
+    rows = conn.execute(query, params).fetchall()
+    # Convert to plain dicts so tojson works in template
+    questions = [dict(r) for r in rows]
     conn.close()
     return render_template("quiz_play.html", questions=questions, levels=levels)
 
