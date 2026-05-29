@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}AI Solver{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>&#x1F9EE; AI Math Solver</h1>
+    <p>Type any math problem — get instant step-by-step solution</p>
+</div>
+
+<div class="solver-wrap">
+    <div class="solver-examples">
+        <span class="ex-label">Try:</span>
+        <button class="ex-btn" onclick="setExample('2x + 5 = 13')">2x + 5 = 13</button>
+        <button class="ex-btn" onclick="setExample('x**2 - 5*x + 6 = 0')">x² - 5x + 6 = 0</button>
+        <button class="ex-btn" onclick="setExample('integrate x**2')">∫ x² dx</button>
+        <button class="ex-btn" onclick="setExample('differentiate sin(x)*e**x')">d/dx sin(x)·eˣ</button>
+        <button class="ex-btn" onclick="setExample('What is 20% of 350?')">20% of 350</button>
+        <button class="ex-btn" onclick="setExample('Find eigenvalues of [[4,1],[2,3]]')">Eigenvalues</button>
+    </div>
+
+    <div class="solver-box">
+        <textarea id="problem-input" class="solver-input" rows="3"
+            placeholder="Type your math problem here...&#10;Examples: 3x - 7 = 2x + 4  |  x^2 + 5x + 6  |  Find the derivative of x^3 + 2x"></textarea>
+        <button class="btn-solve" onclick="solveProblem()" id="solve-btn">
+            &#x26A1; Solve Now
+        </button>
+    </div>
+
+    <div id="result-area" class="result-area" style="display:none;">
+        <div id="result-sympy" class="result-block sympy-block" style="display:none;">
+            <div class="result-label">&#x1F4BB; SymPy Result</div>
+            <div id="sympy-content" class="result-content"></div>
+        </div>
+        <div id="result-ai" class="result-block ai-block" style="display:none;">
+            <div class="result-label">&#x1F916; AI Step-by-Step Explanation</div>
+            <div id="ai-content" class="result-content"></div>
+        </div>
+        <div id="result-nokey" class="result-block nokey-block" style="display:none;">
+            <div class="result-label">&#x26A0;&#xFE0F; AI Unavailable</div>
+            <div class="result-content">No Anthropic API key set. SymPy result shown above.<br>
+            To enable AI explanations, set the <code>ANTHROPIC_API_KEY</code> environment variable and restart.</div>
+        </div>
+    </div>
+</div>
+
+<div class="solver-tips">
+    <div class="tips-title">&#x1F4AC; Input Tips</div>
+    <div class="tips-grid">
+        <div class="tip"><code>x**2</code> → x²</div>
+        <div class="tip"><code>sqrt(x)</code> → √x</div>
+        <div class="tip"><code>sin(x), cos(x)</code> → trig</div>
+        <div class="tip"><code>log(x)</code> → ln(x)</div>
+        <div class="tip"><code>2x + 3 = 7</code> → equation</div>
+        <div class="tip"><code>differentiate x**3</code> → d/dx</div>
+        <div class="tip"><code>integrate x**2</code> → ∫</div>
+        <div class="tip"><code>E, pi</code> → e, π</div>
+    </div>
+</div>
+
+<script>
+function setExample(text) {
+    document.getElementById('problem-input').value = text;
+    document.getElementById('problem-input').focus();
+}
+
+async function solveProblem() {
+    const problem = document.getElementById('problem-input').value.trim();
+    if (!problem) return;
+
+    const btn = document.getElementById('solve-btn');
+    btn.textContent = '⏳ Solving...';
+    btn.disabled = true;
+
+    document.getElementById('result-area').style.display = 'none';
+    document.getElementById('result-sympy').style.display = 'none';
+    document.getElementById('result-ai').style.display = 'none';
+    document.getElementById('result-nokey').style.display = 'none';
+
+    try {
+        const resp = await fetch('/api/solve', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({problem})
+        });
+        const data = await resp.json();
+
+        document.getElementById('result-area').style.display = 'block';
+
+        if (data.sympy) {
+            document.getElementById('sympy-content').textContent = data.sympy;
+            document.getElementById('result-sympy').style.display = 'block';
+        }
+
+        if (data.ai_explanation) {
+            document.getElementById('ai-content').innerText = data.ai_explanation;
+            document.getElementById('result-ai').style.display = 'block';
+            if (window.MathJax) MathJax.typesetPromise([document.getElementById('ai-content')]);
+        } else if (!data.sympy) {
+            document.getElementById('result-nokey').style.display = 'block';
+        }
+    } catch(e) {
+        document.getElementById('result-area').style.display = 'block';
+        document.getElementById('result-nokey').style.display = 'block';
+    }
+
+    btn.textContent = '⚡ Solve Now';
+    btn.disabled = false;
+}
+
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') solveProblem();
+});
+</script>
+{% endblock %}

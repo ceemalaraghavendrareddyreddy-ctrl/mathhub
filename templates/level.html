@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ level }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <a href="/" class="back-link">&#x2190; Home</a>
+    <h1>{{ level }}</h1>
+    <p>Select a subject and topic to explore questions</p>
+</div>
+
+{% for subject, topics in subjects.items() %}
+<div class="subject-section">
+    <div class="subject-title">
+        {% if subject == 'Arithmetic' %}&#x1F522;
+        {% elif subject == 'Algebra' %}&#x1F4D0;
+        {% elif subject == 'Geometry' %}&#x1F4D0;
+        {% elif subject == 'Calculus' %}&#x1F4C8;
+        {% elif subject == 'Trigonometry' %}&#x1F4CF;
+        {% elif subject == 'Statistics' %}&#x1F4CA;
+        {% elif subject == 'Analysis' %}&#x1F9EA;
+        {% else %}&#x1F4DA;{% endif %}
+        {{ subject }}
+    </div>
+    <div class="topic-grid">
+        {% for t in topics %}
+        <a href="/topic/{{ t.id }}" class="topic-card">
+            <div class="topic-name">{{ t.topic }}</div>
+            <div class="topic-arrow">&#x2192;</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

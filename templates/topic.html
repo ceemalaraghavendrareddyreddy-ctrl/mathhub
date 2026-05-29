@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ topic.topic }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <a href="/level/{{ topic.level }}" class="back-link">&#x2190; {{ topic.level }}</a>
+    <h1>{{ topic.topic }}</h1>
+    <p>{{ topic.level }} &mdash; {{ topic.subject }}</p>
+</div>
+
+{% if questions %}
+<div class="questions-list">
+    {% for q in questions %}
+    <a href="/question/{{ q.id }}" class="question-row">
+        <div class="q-badge {{ q.difficulty | lower }}">{{ q.difficulty }}</div>
+        <div class="q-text">{{ q.question }}</div>
+        <div class="q-arrow">&#x2192;</div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">No questions available for this topic yet.</div>
+{% endif %}
+{% endblock %}

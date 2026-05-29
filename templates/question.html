@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ q.question[:50] }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <a href="/topic/{{ q.topic_id }}" class="back-link">&#x2190; {{ q.topic }}</a>
+    <div class="q-meta">{{ q.level }} &mdash; {{ q.subject }} &mdash;
+        <span class="q-badge {{ q.difficulty | lower }}">{{ q.difficulty }}</span>
+    </div>
+</div>
+
+<div class="question-card">
+    <div class="card-section question-section">
+        <div class="section-label">&#x2753; Question</div>
+        <div class="question-text">{{ q.question }}</div>
+    </div>
+
+    <div class="reveal-wrap">
+        <button class="btn-reveal" onclick="toggleAnswer()">&#x1F441; Show Answer</button>
+    </div>
+
+    <div class="card-section answer-section" id="answer-block" style="display:none;">
+        <div class="section-label">&#x2705; Answer</div>
+        <div class="answer-text">{{ q.solution }}</div>
+    </div>
+
+    <div class="card-section explanation-section" id="explain-block" style="display:none;">
+        <div class="section-label">&#x1F4A1; Step-by-Step Explanation</div>
+        <div class="explanation-text">{{ q.explanation }}</div>
+    </div>
+</div>
+
+<div class="nav-questions">
+    <a href="/topic/{{ q.topic_id }}" class="btn-outline">&#x1F4CB; All Questions in this Topic</a>
+    <a href="/solver" class="btn-primary">&#x1F9EE; Try AI Solver</a>
+</div>
+
+<script>
+function toggleAnswer() {
+    const ab = document.getElementById('answer-block');
+    const eb = document.getElementById('explain-block');
+    const btn = document.querySelector('.btn-reveal');
+    if (ab.style.display === 'none') {
+        ab.style.display = 'block';
+        eb.style.display = 'block';
+        btn.textContent = '🙈 Hide Answer';
+        if (window.MathJax) MathJax.typesetPromise([ab, eb]);
+    } else {
+        ab.style.display = 'none';
+        eb.style.display = 'none';
+        btn.textContent = '👁 Show Answer';
+    }
+}
+</script>
+{% endblock %}

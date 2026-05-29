@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="hero">
+    <div class="hero-icon">&#x221E;</div>
+    <h1>MathHub</h1>
+    <p class="hero-subtitle">One Stop Math Solution — Grade 1 to University</p>
+    <div class="hero-actions">
+        <a href="/solver" class="btn-primary">&#x1F9EE; AI Math Solver</a>
+        <a href="/search" class="btn-outline">&#x1F50D; Search Questions</a>
+    </div>
+</div>
+
+<div class="level-grid">
+    {% for lv in levels %}
+    <a href="/level/{{ lv }}" class="level-card
+        {% if 'Grade 1' == lv or 'Grade 2' == lv or 'Grade 3' == lv %}card-primary
+        {% elif 'Grade 4' == lv or 'Grade 5' == lv or 'Grade 6' == lv %}card-success
+        {% elif 'Grade 7' == lv or 'Grade 8' == lv or 'Grade 9' == lv %}card-warning
+        {% elif 'Grade 10' == lv or 'Grade 11' == lv or 'Grade 12' == lv %}card-danger
+        {% else %}card-university{% endif %}">
+        <div class="card-icon">
+            {% if 'Grade 1' in lv or 'Grade 2' in lv or 'Grade 3' in lv %}&#x1F522;
+            {% elif 'Grade 4' in lv or 'Grade 5' in lv or 'Grade 6' in lv %}&#x1F4D0;
+            {% elif 'Grade 7' in lv or 'Grade 8' in lv or 'Grade 9' in lv %}&#x1F4CF;
+            {% elif 'Grade 10' in lv or 'Grade 11' in lv or 'Grade 12' in lv %}&#x1F4C8;
+            {% else %}&#x1F393;{% endif %}
+        </div>
+        <div class="card-label">{{ lv }}</div>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="features-row">
+    <div class="feature-box">
+        <div class="feat-icon">&#x1F4DA;</div>
+        <h3>50+ Topics</h3>
+        <p>Covering all math subjects from basic counting to real analysis</p>
+    </div>
+    <div class="feature-box">
+        <div class="feat-icon">&#x270F;&#xFE0F;</div>
+        <h3>Step-by-Step</h3>
+        <p>Every question has a detailed explanation so you truly understand</p>
+    </div>
+    <div class="feature-box">
+        <div class="feat-icon">&#x1F9EE;</div>
+        <h3>AI Solver</h3>
+        <p>Type any math problem and get an instant AI-powered solution</p>
+    </div>
+    <div class="feature-box">
+        <div class="feat-icon">&#x1F4F1;</div>
+        <h3>Mobile Ready</h3>
+        <p>Works on phone, tablet and desktop — learn anywhere</p>
+    </div>
+</div>
+{% endblock %}

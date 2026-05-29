@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>&#x1F50D; Search Questions</h1>
+    <p>Search across all grades and topics</p>
+</div>
+
+<form class="search-form" action="/search" method="get">
+    <input type="text" name="q" value="{{ query }}" class="search-input"
+        placeholder="e.g. quadratic, differentiation, profit loss..." autofocus>
+    <button type="submit" class="btn-primary">Search</button>
+</form>
+
+{% if query %}
+    {% if results %}
+    <div class="results-count">Found {{ results|length }} result(s) for "<strong>{{ query }}</strong>"</div>
+    <div class="questions-list">
+        {% for q in results %}
+        <a href="/question/{{ q.id }}" class="question-row">
+            <div class="q-meta-small">{{ q.level }} &mdash; {{ q.topic }}</div>
+            <div class="q-badge {{ q.difficulty | lower }}">{{ q.difficulty }}</div>
+            <div class="q-text">{{ q.question }}</div>
+            <div class="q-arrow">&#x2192;</div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div style="font-size:3rem;">&#x1F914;</div>
+        No questions found for "<strong>{{ query }}</strong>".<br>
+        Try the <a href="/solver">AI Solver</a> for any custom problem.
+    </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

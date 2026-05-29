@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MathHub{% endblock %} — One Stop Math Solution</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- PWA -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#4f8ef7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MathHub">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+    </script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$','$'],['\\(','\\)']] },
+            options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+        };
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="/">&#x221E; MathHub</a>
+        </div>
+        <div class="nav-links">
+            <a href="/solver" class="nav-btn">&#x1F9EE; AI Solver</a>
+            <a href="/search" class="nav-btn">&#x1F50D; Search</a>
+        </div>
+    </nav>
+
+    <div class="sidebar">
+        <div class="sidebar-title">Grades & Levels</div>
+        {% for lv in levels %}
+        <a href="/level/{{ lv }}" class="sidebar-link {% if request.path == '/level/' ~ lv %}active{% endif %}">
+            {{ lv }}
+        </a>
+        {% endfor %}
+        <hr style="border-color:#334;">
+        <a href="/solver" class="sidebar-link special">&#x1F9EE; AI Solver</a>
+        <a href="/search" class="sidebar-link special">&#x1F50D; Search</a>
+    </div>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

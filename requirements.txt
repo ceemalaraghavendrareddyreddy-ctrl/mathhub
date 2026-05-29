@@ -1,0 +1,6 @@
+flask
+sympy
+anthropic
+google-genai
+groq
+gunicorn

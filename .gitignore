@@ -1,0 +1,8 @@
+config.txt
+gemini_key.txt
+groq_key.txt
+math.db
+__pycache__/
+*.pyc
+.env
+.claude/
