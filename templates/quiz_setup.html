@@ -6,6 +6,9 @@
     <p>Test yourself and check your score</p>
 </div>
 
+{% if error %}
+<div class="error-banner">⚠️ {{ error }}</div>
+{% endif %}
 <div class="quiz-setup-wrap">
     <div class="setup-card">
         <div class="setup-label">📚 Select Level</div>

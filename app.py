@@ -105,9 +105,11 @@ def quiz_play():
     query += " ORDER BY RANDOM() LIMIT ?"
     params.append(num)
     rows = conn.execute(query, params).fetchall()
-    # Convert to plain dicts so tojson works in template
     questions = [dict(r) for r in rows]
     conn.close()
+    if not questions:
+        return render_template("quiz_setup.html", levels=levels,
+                               error="No questions found for selected filters. Please try different options.")
     return render_template("quiz_play.html", questions=questions, levels=levels)
 
 @app.route("/bookmarks")

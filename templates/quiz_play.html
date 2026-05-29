@@ -15,9 +15,9 @@
 <div id="quiz-area">
     {% for q in questions %}
     <div class="quiz-question-card" id="qcard-{{ loop.index0 }}" style="display:{% if loop.first %}block{% else %}none{% endif %}">
-        <div class="q-level-tag">{{ q.level }} — {{ q.topic }}</div>
-        <div class="quiz-badge {{ q.difficulty|lower }}">{{ q.difficulty }}</div>
-        <div class="quiz-q-text">{{ q.question }}</div>
+        <div class="q-level-tag">{{ q['level'] }} — {{ q['topic'] }}</div>
+        <div class="quiz-badge {{ q['difficulty']|lower }}">{{ q['difficulty'] }}</div>
+        <div class="quiz-q-text">{{ q['question'] }}</div>
 
         <div class="quiz-actions">
             <button class="btn-show-ans" onclick="showAnswer({{ loop.index0 }})">👁 Show Answer</button>
@@ -25,9 +25,9 @@
 
         <div class="quiz-answer-block" id="ans-{{ loop.index0 }}" style="display:none">
             <div class="ans-label">✅ Answer</div>
-            <div class="ans-text">{{ q.solution }}</div>
+            <div class="ans-text">{{ q['solution'] }}</div>
             <div class="exp-label">💡 Explanation</div>
-            <div class="exp-text">{{ q.explanation }}</div>
+            <div class="exp-text">{{ q['explanation'] }}</div>
 
             <div class="self-assess">
                 <div class="assess-label">Did you get it right?</div>
