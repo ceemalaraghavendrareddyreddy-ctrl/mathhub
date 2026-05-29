@@ -9,6 +9,11 @@ from database.db import (
 
 app = Flask(__name__)
 
+# Initialize DB on startup (works with both gunicorn and direct run)
+with app.app_context():
+    from database.db import init_db
+    init_db()
+
 CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def _read_config(filename):
@@ -211,7 +216,6 @@ def ask_gemini(problem, sympy_hint=None):
         return f"AI explanation unavailable: {err}"
 
 if __name__ == "__main__":
-    init_db()
     print("=" * 50)
     print("  Math App — One Stop Math Solution")
     print("  Open in browser: http://127.0.0.1:5000")
